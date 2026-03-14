@@ -18,7 +18,7 @@
       <p class="explore-group-label">{{ $label }}</p>
       <div class="explore-tag-row">
         {{- range .tags }}
-        {{- $tagSlug := . | urlize }}
+        {{- $tagSlug := . | lower | urlize }}
         {{- $taxPages := index $.Site.Taxonomies.explore $tagSlug }}
         {{- if and $taxPages (gt (len $taxPages) 0) }}
         <button class="explore-tag-btn" data-tag="{{ . }}" onclick="exploreFilter(this)">

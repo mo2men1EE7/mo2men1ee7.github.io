@@ -2,6 +2,7 @@ baseURL = "https://mo2men1ee7.github.io/"
 title   = "BluRRedSec"
 theme   = "blurredsec"
 disableHugoGeneratorInject = true
+disablePathToLower = true
 languageCode = "en"
 
 [pagination]

@@ -1,7 +1,7 @@
 ---
-title: "AWS S3 Misconfiguration Cheatsheet"
+title: AWS S3 Misconfiguration Cheatsheet
 date: 2026-01-28
-summary: "Quick reference for S3 misconfigs — detection and remediation."
+summary: Quick reference for S3 misconfigs — detection and remediation.
 explore:
   - Cheatsheet
   - AWS
