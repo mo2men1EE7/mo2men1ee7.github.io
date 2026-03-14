@@ -1,12 +1,13 @@
 ---
 title: "HTB Pro Lab: FullChain — From Web Foothold to Domain Admin via ADCS ESC8 and GCP Metadata Abuse"
 date: 2026-03-14
-summary: Full pro lab walkthrough covering SSTI, NTLM relay, ADCS ESC8, Docker escape, andddd GCP service account privilege escalation to achieve Domain Admin and full cloud compromise.
+summary: Full pro lab walkthrough covering SSTI, NTLM relay, ADCS ESC8, Docker escape, and GCP service account privilege escalation to achieve Domain Admin and full cloud compromise.
 explore:
   - HackTheBox
   - GCP
   - Azure
   - AWS
+  - Blog
 difficulty: Insane
 hot: true
 draft: false
