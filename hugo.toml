@@ -25,19 +25,19 @@ languageCode = "en"
 [menu]
   [[menu.main]]
     name   = "Writeups"
-    url    = "/Writeups/"
+    url    = "/writeups/"
     weight = 10
   [[menu.main]]
     name   = "Notes"
-    url    = "/Notes/"
+    url    = "/notes/"
     weight = 20
   [[menu.main]]
     name   = "Cheatsheets"
-    url    = "/Cheatsheets/"
+    url    = "/cheatsheets/"
     weight = 30
   [[menu.main]]
     name   = "Blogs & News"
-    url    = "/Blogs/"
+    url    = "/blogs/"
     weight = 40
 
 [outputs]
