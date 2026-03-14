@@ -13,7 +13,7 @@ hot: true
 draft: false
 ---
 
-## Notice Box Showcasdzzddzzdze
+## Notice Box Showcase
 
 {{< notice-small "golden" "mhm.webp" "Flag: HTB{s0m3_fl4g_h3re}" >}}
 
