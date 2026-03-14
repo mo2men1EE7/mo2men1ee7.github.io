@@ -2,6 +2,7 @@ baseURL = "https://mo2men1ee7.github.io/"
 title   = "BluRRedSec"
 theme   = "blurredsec"
 disableHugoGeneratorInject = true
+disablePathToLower = true
 languageCode = "en"
 
 [pagination]
@@ -25,19 +26,19 @@ languageCode = "en"
 [menu]
   [[menu.main]]
     name   = "Writeups"
-    url    = "/writeups/"
+    url    = "/Writeups/"
     weight = 10
   [[menu.main]]
     name   = "Notes"
-    url    = "/notes/"
+    url    = "/Notes/"
     weight = 20
   [[menu.main]]
     name   = "Cheatsheets"
-    url    = "/cheatsheets/"
+    url    = "/Cheatsheets/"
     weight = 30
   [[menu.main]]
     name   = "Blogs & News"
-    url    = "/blogs/"
+    url    = "/Blogs/"
     weight = 40
 
 [outputs]
