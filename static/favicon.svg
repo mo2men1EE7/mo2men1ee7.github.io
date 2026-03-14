@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <filter id="rg"><feOffset dx="-5" dy="2.5"/></filter>
+    <filter id="bg"><feOffset dx="5" dy="-2.5"/></filter>
+  </defs>
+  <text x="16" y="27" text-anchor="middle" font-family="'Arial Black',sans-serif" font-weight="900" font-size="26" fill="#ff0055" filter="url(#rg)">R</text>
+  <text x="16" y="27" text-anchor="middle" font-family="'Arial Black',sans-serif" font-weight="900" font-size="26" fill="#00d4ff" filter="url(#bg)">R</text>
+  <text x="16" y="27" text-anchor="middle" font-family="'Arial Black',sans-serif" font-weight="900" font-size="26" fill="rgba(255,255,255,0.68)">R</text>
+</svg>

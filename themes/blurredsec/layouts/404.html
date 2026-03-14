@@ -1,0 +1,18 @@
+{{ define "main" }}
+<div class="error-container">
+  <div class="error-bg-code">404</div>
+  <div class="error-content">
+    <div class="error-emoji">
+      <img src="https://cdn3.emoji.gg/emojis/8254-bonkers.png" width="88" height="88" alt="bonkers">
+    </div>
+    <h1 class="error-status">:: INTEL_N0T_F0UND ::</h1>
+    <p class="error-msg">The requested data fragment is missing from the BluRRedSec archives.</p>
+    <p class="error-msg">
+      <i>or maybe you're just hallucinating..
+        <img src="https://cdn3.emoji.gg/emojis/45750-smug-crying-facepalm.png" width="26" height="26" alt="smug" style="vertical-align:middle;margin-left:5px;">
+      </i>
+    </p>
+    <a class="error-return-btn" href="{{ "/" | relURL }}">[ RETURN_TO_BASE ]</a>
+  </div>
+</div>
+{{ end }}

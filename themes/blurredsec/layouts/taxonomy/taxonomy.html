@@ -1,0 +1,150 @@
+{{ define "main" }}
+{{- $allPages := site.RegularPages }}
+
+<div class="section-page no-toc">
+  <h1>EXPLORE</h1>
+
+  {{- $groups := slice
+    (dict "label" "Cloud Provider" "tags" (slice "AWS" "Azure" "GCP"))
+    (dict "label" "Platform" "tags" (slice "HackTheBox" "TryHackMe" "PwnedLabs" "PortSwigger" "HackingHub" "CyberDefenders" "Cryptohack" "Cybr" "Hack Smarter"))
+    (dict "label" "Topic" "tags" (slice "Active Directory" "Forensics" "Malware" "SOC" "Threat Hunt" "Threat Intel" "Pentest" "DevOps" "Phishing" "Misc"))
+    (dict "label" "Content Type" "tags" (slice "Blog" "News" "Notes" "Project" "Cheatsheet"))
+  -}}
+
+  <div class="explore-groups">
+    {{- range $groups }}
+    {{- $label := .label }}
+    <div class="explore-group">
+      <p class="explore-group-label">{{ $label }}</p>
+      <div class="explore-tag-row">
+        {{- range .tags }}
+        {{- $tagSlug := . | urlize }}
+        {{- $taxPages := index $.Site.Taxonomies.explore $tagSlug }}
+        {{- if and $taxPages (gt (len $taxPages) 0) }}
+        <button class="explore-tag-btn" data-tag="{{ . }}" onclick="exploreFilter(this)">
+          {{- partial "tag-badge.html" . }}
+        </button>
+        {{- end }}
+        {{- end }}
+      </div>
+    </div>
+    {{- end }}
+    <div class="explore-group clear-row">
+      <div class="explore-tag-row">
+        <button class="pg-btn explore-clear-btn" id="explore-clear" onclick="exploreClear()" style="display:none">[ CLEAR FILTER ]</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="explore-results" class="home-content-wrap" style="margin-top:40px"></div>
+  <div id="explore-pagination" class="pagination" style="margin-top:16px;justify-content:center"></div>
+</div>
+
+<script>
+var EXPLORE_POSTS = [
+  {{- $first := true }}
+  {{- range $allPages }}
+  {{- $tags := .Params.explore }}
+  {{- if $tags }}
+  {{- if not $first }},{{ end }}{{- $first = false }}
+  { title: '{{ .Title | replaceRE "'" "\\x27" }}', url: '{{ .Permalink }}', hot: {{ if .Params.hot }}true{{ else }}false{{ end }}, tags: [{{ range $i,$t := $tags }}{{ if $i }},{{ end }}'{{ $t }}'{{ end }}], badges: '{{ range $tags }}{{ partial "tag-badge.html" . | replaceRE "'" "\\x27" }}{{ end }}' }
+  {{- end }}
+  {{- end }}
+];
+
+var _xf = [];
+var PER_PAGE = 7;
+
+function xMakeCard(p) {
+  var badges = p.badges || '';
+  var hotBadge = p.hot ? '<span class="tech-badge hot-pop" style="background:#ff0b55;box-shadow:0 2px 8px rgba(255,11,85,0.5)">HOT!\uD83D\uDD25</span>' : '';
+  var ARROW = '<svg class="entry-arrow-icon" width="17" height="17" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0"/><path d="M13 18l6 -6"/><path d="M13 6l6 6"/></svg>';
+  return '<div class="post-entry">' +
+    '<a class="entry-link-wrapper" href="' + p.url + '">' +
+    '<div class="modern-hover-box">' +
+    '<div class="title-left-group">' + hotBadge + '<h2 class="modern-title">' + p.title + '</h2></div>' +
+    '<div class="right-group">' + badges + ARROW + '</div>' +
+    '</div></a></div>';
+}
+
+function xRenderPage(page) {
+  var total = Math.ceil(_xf.length / PER_PAGE) || 1;
+  var slice = _xf.slice((page-1)*PER_PAGE, page*PER_PAGE);
+  document.getElementById('explore-results').innerHTML = slice.length
+    ? slice.map(xMakeCard).join('')
+    : '<p style="opacity:0.4;font-family:\'Fira Code\',monospace;font-size:0.8rem;padding:18px 0">No posts found.</p>';
+
+  var pg = '';
+  var winStart = page - 2;
+  var winEnd   = page + 2;
+  /* « only when page 1 is outside the visible window */
+  if (total > 6 && winStart > 1) {
+    pg += '<button class="pg-btn pg-edge" onclick="xRenderPage(1)" title="First">&laquo;</button>';
+  }
+  /* ‹ prev */
+  pg += page > 1 ? '<button class="pg-btn" onclick="xRenderPage('+(page-1)+')">&lt;</button>' : '<button class="pg-btn" disabled>&lt;</button>';
+  /* windowed ±2, no forced endpoints */
+  for (var k = 1; k <= total; k++) {
+    if (k < winStart || k > winEnd) continue;
+    pg += '<button class="pg-btn'+(k===page?' active':'')+'" onclick="xRenderPage('+k+')">'+k+'</button>';
+  }
+  /* › next */
+  pg += page < total ? '<button class="pg-btn" onclick="xRenderPage('+(page+1)+')">&gt;</button>' : '<button class="pg-btn" disabled>&gt;</button>';
+  /* » only when last page is outside the visible window */
+  if (total > 6 && winEnd < total) {
+    pg += '<button class="pg-btn pg-edge" onclick="xRenderPage('+total+')" title="Last">&raquo;</button>';
+  }
+  document.getElementById('explore-pagination').innerHTML = pg;
+  injectLangIcons();
+  updateTagIcons();
+}
+
+function exploreFilter(btn) {
+  /* always clear no-hover first so re-clicking while still hovering works */
+  btn.classList.remove('no-hover');
+  var wasActive = btn.classList.contains('active');
+
+  /* toggle this tag on/off */
+  btn.classList.toggle('active');
+
+  /* if we just deactivated — snap back to rest state immediately,
+     restore hover only after cursor moves away */
+  if (wasActive) {
+    btn.classList.add('no-hover');
+    document.addEventListener('mousemove', function off(e) {
+      if (e.target !== btn && !btn.contains(e.target)) {
+        btn.classList.remove('no-hover');
+        document.removeEventListener('mousemove', off);
+      }
+    });
+  }
+
+  /* collect all currently active tags */
+  var activeTags = [];
+  document.querySelectorAll('.explore-tag-btn.active').forEach(function(b) {
+    activeTags.push(b.getAttribute('data-tag'));
+  });
+
+  if (activeTags.length === 0) {
+    exploreClear();
+    return;
+  }
+
+  /* AND filter — post must have every active tag */
+  _xf = EXPLORE_POSTS.filter(function(p) {
+    return activeTags.every(function(t) { return p.tags.indexOf(t) >= 0; });
+  });
+
+  xRenderPage(1);
+  document.getElementById('explore-clear').style.display = '';
+}
+
+function exploreClear() {
+  _xf = [];
+  document.querySelectorAll('.explore-tag-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('explore-results').innerHTML = '';
+  document.getElementById('explore-pagination').innerHTML = '';
+  document.getElementById('explore-clear').style.display = 'none';
+}
+</script>
+{{ end }}

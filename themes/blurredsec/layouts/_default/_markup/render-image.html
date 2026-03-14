@@ -1,0 +1,9 @@
+{{- $src   := .Destination -}}
+{{- $alt   := .Text -}}
+{{- $title := .Title -}}
+<figure>
+  <img src="{{ $src }}" alt="{{ $alt }}" loading="lazy">
+  {{- if $title }}
+  <figcaption>{{ $title }}</figcaption>
+  {{- end }}
+</figure>

@@ -1,0 +1,53 @@
+baseURL = "https://mo2men1ee7.github.io/"
+title   = "BluRRedSec"
+theme   = "blurredsec"
+disableHugoGeneratorInject = true
+languageCode = "en"
+
+[pagination]
+  pagerSize = 7
+
+[markup.highlight]
+  style       = "catppuccin-mocha"
+  noClasses   = false
+  lineNos     = false
+  guessSyntax = true
+
+[markup.goldmark.renderer]
+  unsafe = true
+
+[params]
+  author       = "Moemen"
+  description  = "Security Analyst | Blue Teamer | CloudSec"
+  bio          = "I document my journey through Labs & CTF challenges, craft cheatsheets, and share my personal study notes and cyber field insights."
+  mainSections = ["Writeups", "Notes", "Cheatsheets", "Blogs"]
+
+[menu]
+  [[menu.main]]
+    name   = "Writeups"
+    url    = "/Writeups/"
+    weight = 10
+  [[menu.main]]
+    name   = "Notes"
+    url    = "/Notes/"
+    weight = 20
+  [[menu.main]]
+    name   = "Cheatsheets"
+    url    = "/Cheatsheets/"
+    weight = 30
+  [[menu.main]]
+    name   = "Blogs & News"
+    url    = "/Blogs/"
+    weight = 40
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+
+[taxonomies]
+  tag = "explore"
+
+[permalinks]
+  explore = "/explore/:slug/"
+
+[minify]
+  minifyOutput = true

@@ -1,0 +1,29 @@
+{{ define "main" }}
+<div class="section-page">
+  {{- $t := .Title | strings.TrimPrefix "// " | strings.TrimPrefix "/ " | strings.TrimPrefix "//" }}
+  <h1>{{ $t }}</h1>
+
+  {{- $pager := .Paginate .Pages 7 }}
+  <div class="home-content-wrap">
+    {{- range $pager.Pages }}{{- partial "post-card.html" . }}{{- end }}
+
+    <div class="pagination">
+      {{- $cur := $pager.PageNumber }}{{- $tot := $pager.TotalPages }}
+      {{- $first := index $pager.Pagers 0 }}{{- $last := index $pager.Pagers (sub $tot 1) }}
+      {{- $winStart := sub $cur 2 }}{{- $winEnd := add $cur 2 }}
+      {{- if and (gt $tot 6) (gt $winStart 1) }}<a class="pg-btn pg-edge" href="{{ $first.URL }}" title="First">&laquo;</a>{{- end }}
+      {{- if $pager.HasPrev }}<a class="pg-btn" href="{{ $pager.Prev.URL }}">&lt;</a>
+      {{- else }}<button class="pg-btn" disabled>&lt;</button>{{- end }}
+      {{- range $pager.Pagers }}
+        {{- $n := .PageNumber }}
+        {{- if and (ge $n $winStart) (le $n $winEnd) }}
+        <a class="pg-btn{{ if eq .PageNumber $cur }} active{{ end }}" href="{{ .URL }}">{{ $n }}</a>
+        {{- end }}
+      {{- end }}
+      {{- if $pager.HasNext }}<a class="pg-btn" href="{{ $pager.Next.URL }}">&gt;</a>
+      {{- else }}<button class="pg-btn" disabled>&gt;</button>{{- end }}
+      {{- if and (gt $tot 6) (lt $winEnd $tot) }}<a class="pg-btn pg-edge" href="{{ $last.URL }}" title="Last">&raquo;</a>{{- end }}
+    </div>
+  </div>
+</div>
+{{ end }}

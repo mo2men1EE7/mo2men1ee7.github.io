@@ -1,0 +1,59 @@
+{{ define "main" }}
+<div class="home-content-wrap">
+
+<div class="hack-profile-container">
+  <div class="profile-text-side">
+    <h1>Hi, I'm {{ site.Params.author }} <span class="spider-emoji">🕸️</span></h1>
+    <p class="role">Security Analyst | Blue Teamer | CloudSec</p>
+    <p class="bio">{{ site.Params.bio }}</p>
+  </div>
+  <div class="profile-image-side">
+    <img class="profile-pic profile-normal"
+         src="{{ "/images/profile.jpeg" | relURL }}" alt="{{ site.Params.author }}"
+         onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=moemen&backgroundColor=1a1a2e'"/>
+    <img class="profile-pic profile-glass"
+         src="{{ "/images/profile-glass.jpg" | relURL }}" alt="{{ site.Params.author }}"
+         onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=moemen&backgroundColor=1a1a2e'"/>
+  </div>
+</div>
+
+{{- $all := slice }}
+{{- range site.Sections }}
+  {{- $all = $all | append .Pages }}
+{{- end }}
+{{- $all = sort $all "Date" "desc" }}
+
+{{- $pager := .Paginate $all 5 }}
+
+{{- range $pager.Pages }}
+  {{- partial "post-card.html" . }}
+{{- end }}
+
+{{- if not $pager.Pages }}
+<p style="opacity:0.4;font-family:'Fira Code',monospace;font-size:0.8rem;padding:18px 0">
+  No posts yet — add content to Writeups, Notes, Cheatsheets or Blogs.
+</p>
+{{- end }}
+
+{{- if gt $pager.TotalPages 1 }}
+{{- $cur := $pager.PageNumber }}{{- $tot := $pager.TotalPages }}
+{{- $first := index $pager.Pagers 0 }}{{- $last := index $pager.Pagers (sub $tot 1) }}
+<div class="pagination">
+  {{- $winStart := sub $cur 2 }}{{- $winEnd := add $cur 2 }}
+  {{- if and (gt $tot 6) (gt $winStart 1) }}<a class="pg-btn pg-edge" href="{{ $first.URL }}" title="First">&laquo;</a>{{- end }}
+  {{- if $pager.HasPrev }}<a class="pg-btn" href="{{ $pager.Prev.URL }}">&lt;</a>
+  {{- else }}<button class="pg-btn" disabled>&lt;</button>{{- end }}
+  {{- range $pager.Pagers }}
+    {{- $n := .PageNumber }}
+    {{- if and (ge $n $winStart) (le $n $winEnd) }}
+    <a class="pg-btn{{ if eq .PageNumber $cur }} active{{ end }}" href="{{ .URL }}">{{ $n }}</a>
+    {{- end }}
+  {{- end }}
+  {{- if $pager.HasNext }}<a class="pg-btn" href="{{ $pager.Next.URL }}">&gt;</a>
+  {{- else }}<button class="pg-btn" disabled>&gt;</button>{{- end }}
+  {{- if and (gt $tot 6) (lt $winEnd $tot) }}<a class="pg-btn pg-edge" href="{{ $last.URL }}" title="Last">&raquo;</a>{{- end }}
+</div>
+{{- end }}
+
+</div>
+{{ end }}

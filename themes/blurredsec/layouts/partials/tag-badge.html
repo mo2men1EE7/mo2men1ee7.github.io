@@ -1,0 +1,19 @@
+{{- $raw     := . -}}
+{{- $tag     := $raw | lower -}}
+{{- $tc      := "#fff" -}}
+{{- $emoji   := "" -}}
+{{- $display := $raw -}}
+{{- if eq $tag "news"     }}{{- $emoji = " 📢" }}{{- end -}}
+{{- if eq $tag "phishing" }}{{- $emoji = " 🎣" }}{{- end -}}
+{{- if eq $tag "cybr"     }}{{- $tc = "#000" }}{{- end -}}
+{{- if eq $tag "misc"     }}{{- $tc = "#333" }}{{- end -}}
+{{- if eq $tag "devops"   }}{{- $tc = "#000" }}{{- end -}}
+{{- if eq $tag "aws" -}}
+<span class="tech-badge tag-aws" style="color:{{ $tc }}">{{ $display }}{{ $emoji }}<img class="tag-icon-img" src="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/aws.png" data-normal="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/aws.png" data-glass-dark="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/aws-color.png" data-glass-light="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/aws.png" data-glass-light-filter="brightness(0) saturate(100%) invert(45%) sepia(90%) saturate(600%) hue-rotate(5deg) brightness(0.95)" style="width:13px;height:13px;vertical-align:middle;margin-left:3px;object-fit:contain"></span>
+{{- else if eq $tag "azure" -}}
+<span class="tech-badge tag-azure" style="color:{{ $tc }}">{{ $display }}{{ $emoji }}<img class="tag-icon-img" src="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/azure.png" data-normal="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/azure.png" data-glass-dark="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/azure-color.png" data-glass-light="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/azure-color.png" style="width:13px;height:13px;vertical-align:middle;margin-left:3px;object-fit:contain"></span>
+{{- else if eq $tag "gcp" -}}
+<span class="tech-badge tag-gcp" style="color:{{ $tc }}">{{ $display }}{{ $emoji }}<img class="tag-icon-img" src="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/googlecloud.png" data-normal="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/googlecloud.png" data-glass-dark="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/googlecloud-color.png" data-glass-light="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/googlecloud-color.png" style="width:13px;height:13px;vertical-align:middle;margin-left:3px;object-fit:contain"></span>
+{{- else -}}
+<span class="tech-badge tag-{{ $tag | urlize }}" style="color:{{ $tc }}">{{ $display }}{{ $emoji }}</span>
+{{- end -}}

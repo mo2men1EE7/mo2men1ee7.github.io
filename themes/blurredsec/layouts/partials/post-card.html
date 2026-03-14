@@ -1,0 +1,30 @@
+{{- $page    := . -}}
+{{- $summary := $page.Params.summary | default ($page.Summary | plainify | htmlUnescape | truncate 120) -}}
+{{- $hot     := $page.Params.hot -}}
+<div class="post-entry">
+  <a class="entry-link-wrapper" href="{{ $page.Permalink }}">
+    {{- if $summary }}
+    <div class="synopsis-popover">
+      <h4>{{ $page.Title }}</h4>
+      <p>{{ $summary }}</p>
+    </div>
+    {{- end }}
+    <div class="modern-hover-box">
+      <div class="title-left-group">
+        {{- if $hot }}
+        <span class="tech-badge hot-pop" style="background:#ff0b55;box-shadow:0 2px 8px rgba(255,11,85,0.5)">HOT!🔥</span>
+        {{- end }}
+        <h2 class="modern-title">{{ $page.Title }}</h2>
+      </div>
+      <span class="card-spacer"></span>
+      <div class="right-group">
+        {{- range $page.Params.explore }}
+          {{- partial "tag-badge.html" . }}
+        {{- end }}
+        <svg class="entry-arrow-icon" width="17" height="17" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12l14 0"/><path d="M13 18l6 -6"/><path d="M13 6l6 6"/>
+        </svg>
+      </div>
+    </div>
+  </a>
+</div>

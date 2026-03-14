@@ -1,0 +1,11 @@
+{{- $color := .Get 0 -}}
+{{- $file  := .Get 1 -}}
+{{- $text  := .Get 2 -}}
+<div class="post-callout-box callout-{{ $color }}">
+  <div class="callout-icon-gif">
+    <img src="{{ printf "/images/notices/%s" $file | relURL }}" alt="{{ $color }} notice" width="36" height="36">
+  </div>
+  <div class="callout-text-block">
+    <p class="callout-body">{{ $text }}</p>
+  </div>
+</div>
