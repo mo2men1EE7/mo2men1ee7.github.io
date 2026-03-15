@@ -7,8 +7,6 @@ explore:
   - TryHackMe
   - PwnedLabs
   - PortSwigger
-  - HackingHub
-  - CyberDefenders
   - Cryptohack
   - Cybr
   - Hack Smarter
