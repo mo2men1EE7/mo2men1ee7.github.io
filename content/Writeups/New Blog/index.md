@@ -1,11 +1,10 @@
 ---
-title: New Blog for testing!
+title: New Blog for testing! dont click me
 date: 2026-03-14
 summary: This is my testing blog.
 explore:
   - CyberDefenders
   - Threat-Intel
-  - GCP
   - Misc
 draft: false
 hot: true
