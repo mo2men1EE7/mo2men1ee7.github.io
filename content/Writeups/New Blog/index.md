@@ -3,10 +3,10 @@ title: New Blog
 date: 2026-03-15
 summary: This is my testing blog.
 explore:
-  - AWS
   - CyberDefenders
-  - PortSwigger
   - Forensics
+  - SOC
+  - Threat Intel
 draft: false
 hot: true
 ---
