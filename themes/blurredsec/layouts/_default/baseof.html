@@ -42,6 +42,52 @@
 .profile-pic { width:164px !important; height:164px !important; border-radius:50% !important; object-fit:cover !important; display:block !important; }
 .profile-image-side { flex-shrink:0; width:164px; height:164px; display:flex; align-items:center; justify-content:center; }
 </style>
+
+<script>
+/* ── Favicon Badge — red dot when Clippy has something to say ── */
+var _favCanvas = document.createElement('canvas');
+_favCanvas.width = 32; _favCanvas.height = 32;
+var _favOriginal = null;
+
+function _getFavLink() {
+  return document.querySelector('link[rel~="icon"][type="image/x-icon"], link[rel~="icon"][type="image/svg+xml"], link[rel="icon"]');
+}
+
+function faviconBadge(show) {
+  var link = _getFavLink();
+  if (!link) return;
+
+  if (show) {
+    /* save original href once */
+    if (!_favOriginal) _favOriginal = link.href;
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function() {
+      var ctx = _favCanvas.getContext('2d');
+      ctx.clearRect(0, 0, 32, 32);
+      ctx.drawImage(img, 0, 0, 32, 32);
+      /* red dot — bottom right */
+      ctx.beginPath();
+      ctx.arc(24, 24, 8, 0, 2 * Math.PI);
+      ctx.fillStyle = '#ff0b55';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      link.type = 'image/png';
+      link.href = _favCanvas.toDataURL('image/png');
+    };
+    img.onerror = function() {};
+    img.src = _favOriginal;
+  } else {
+    /* restore original */
+    if (_favOriginal) {
+      link.href = _favOriginal;
+      _favOriginal = null;
+    }
+  }
+}
+</script>
 </head>
 <body class="site-body">
 
@@ -248,6 +294,7 @@
 
     wrap.classList.add('clippy-in');
     if (typeof startClippyFloat === 'function') startClippyFloat();
+    if (typeof faviconBadge === 'function') faviconBadge(true);
 
     if (instant) {
       /* already saw him — restore to buttons stage silently */
@@ -290,6 +337,7 @@
 
     noBtn.addEventListener('click', function(){
       done();
+      if (typeof faviconBadge === 'function') faviconBadge(false);
       popOut(wrap, function(){ wrap.remove(); });
     });
   }
@@ -354,14 +402,20 @@ window.zE=function(){};
   var STORAGE_KEY   = 'brs-build-time';
   var SHOWN_KEY     = 'brs-update-shown';
 
-  /* Read build time baked into this page load */
-  var pageBuildTime = {{ now.Unix }};
-
-  /* Store on first visit */
+  /* On first visit — fetch index.json to get the canonical build time and store it.
+     Never use {{ now.Unix }} per-page because Hugo builds each page at a slightly
+     different time, causing false positives when navigating between pages. */
   var stored = null;
   try { stored = localStorage.getItem(STORAGE_KEY); } catch(e) {}
   if (!stored) {
-    try { localStorage.setItem(STORAGE_KEY, pageBuildTime); } catch(e) {}
+    fetch(VERSION_URL + '?t=' + Date.now())
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.buildTime) {
+          try { localStorage.setItem(STORAGE_KEY, data.buildTime); } catch(e) {}
+        }
+      })
+      .catch(function() {});
     return; /* first visit — nothing to compare yet */
   }
 
@@ -400,6 +454,7 @@ window.zE=function(){};
 
     wrap.classList.add('clippy-in');
     if (typeof startClippyFloat === 'function') startClippyFloat();
+    if (typeof faviconBadge === 'function') faviconBadge(true);
 
     setTimeout(function() {
       bubble.classList.add('clippy-bubble-in');
@@ -416,12 +471,23 @@ window.zE=function(){};
     noBtn.parentNode.replaceChild(newNo, noBtn);
 
     newYes.addEventListener('click', function() {
-      try { localStorage.setItem(STORAGE_KEY, pageBuildTime); } catch(e) {}
-      try { sessionStorage.removeItem(SHOWN_KEY); } catch(e) {}
-      location.reload();
+      /* fetch canonical time before reload so stored value is always from index.json */
+      fetch(VERSION_URL + '?t=' + Date.now())
+        .then(function(r) { return r.json(); })
+        .then(function(d) { if (d.buildTime) { try { localStorage.setItem(STORAGE_KEY, d.buildTime); } catch(e) {} } })
+        .catch(function() {})
+        .finally(function() {
+          if (typeof faviconBadge === 'function') faviconBadge(false);
+          try { sessionStorage.removeItem(SHOWN_KEY); } catch(e) {}
+          location.reload();
+        });
     });
     newNo.addEventListener('click', function() {
-      try { localStorage.setItem(STORAGE_KEY, pageBuildTime); } catch(e) {}
+      fetch(VERSION_URL + '?t=' + Date.now())
+        .then(function(r) { return r.json(); })
+        .then(function(d) { if (d.buildTime) { try { localStorage.setItem(STORAGE_KEY, d.buildTime); } catch(e) {} } })
+        .catch(function() {});
+      if (typeof faviconBadge === 'function') faviconBadge(false);
       wrap.style.animation = 'none';
       wrap.style.transition = 'none';
       wrap.offsetHeight;
