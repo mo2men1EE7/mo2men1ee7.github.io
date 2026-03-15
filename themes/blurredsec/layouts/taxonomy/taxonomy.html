@@ -80,7 +80,7 @@ function xRenderPage(page) {
   var winStart = page - 2;
   var winEnd   = page + 2;
   /* « only when page 1 is outside the visible window */
-  if (total > 4 && winStart > 1) {
+  if (winStart > 1) {
     pg += '<button class="pg-btn pg-edge" onclick="xRenderPage(1)" title="First">&laquo;</button>';
   }
   /* ‹ prev */
@@ -93,7 +93,7 @@ function xRenderPage(page) {
   /* › next */
   pg += page < total ? '<button class="pg-btn" onclick="xRenderPage('+(page+1)+')">&gt;</button>' : '<button class="pg-btn" disabled>&gt;</button>';
   /* » only when last page is outside the visible window */
-  if (total > 4 && winEnd < total) {
+  if (winEnd < total) {
     pg += '<button class="pg-btn pg-edge" onclick="xRenderPage('+total+')" title="Last">&raquo;</button>';
   }
   document.getElementById('explore-pagination').innerHTML = pg;
