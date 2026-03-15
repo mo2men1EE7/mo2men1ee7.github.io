@@ -19,4 +19,4 @@ this is a testing filter
 ```
 `azd`
 
-`Active Directory` `Forensics` `Malware` `SOC` `Threat Hunt` `Threat Intel` `Pentest` `DevOps` `Phishing` `AI` `Misc`
+azddadazdazd
