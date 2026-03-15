@@ -3,9 +3,7 @@ title: New Blog
 date: 2026-03-15
 summary: This is my testing blog.
 explore:
-  - Active Directory
-  - Threat Hunt
-  - Threat Intel
+  - Hack Smarter
 draft: false
 hot: true
 ---
