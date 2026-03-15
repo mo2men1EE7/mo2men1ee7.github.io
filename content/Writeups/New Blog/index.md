@@ -3,14 +3,6 @@ title: New Blog
 date: 2026-03-15
 summary: This is my testing blog.
 explore:
-  - Threat-Intel
-  - Forensics
-  - Malware
-  - SOC
-  - Pentest
-  - Misc
-  - PwnedLabs
-  - AWS
 draft: false
 hot: true
 ---
