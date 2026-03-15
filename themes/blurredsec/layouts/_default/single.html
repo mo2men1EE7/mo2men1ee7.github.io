@@ -46,24 +46,41 @@
   if (!slug) return;
 
   var countEl = document.getElementById('post-views-count');
+  var currentCount = 0;
 
   /* POST to register view + get count */
   fetch(WORKER + '?slug=' + encodeURIComponent(slug), { method: 'POST' })
     .then(function(r) { return r.json(); })
     .then(function(d) {
       if (countEl && d.count !== undefined) {
+        currentCount = d.count;
         countEl.textContent = d.count;
       }
     })
     .catch(function() {
-      /* fallback — just GET count without incrementing */
       fetch(WORKER + '?slug=' + encodeURIComponent(slug))
         .then(function(r) { return r.json(); })
         .then(function(d) {
-          if (countEl && d.count !== undefined) countEl.textContent = d.count;
+          if (countEl && d.count !== undefined) {
+            currentCount = d.count;
+            countEl.textContent = d.count;
+          }
         })
         .catch(function() {});
     });
+
+  /* Poll every 30s — update silently if count changed */
+  setInterval(function() {
+    fetch(WORKER + '?slug=' + encodeURIComponent(slug))
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (countEl && d.count !== undefined && d.count !== currentCount) {
+          currentCount = d.count;
+          countEl.textContent = d.count;
+        }
+      })
+      .catch(function() {});
+  }, 30000);
 })();
 </script>
 {{ end }}
