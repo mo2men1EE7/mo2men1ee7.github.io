@@ -42,7 +42,7 @@
 <script>
 (function() {
   var WORKER = 'https://blurredsec-views.mmlayel.workers.dev';
-  var slug = '{{ .File.BaseFileName }}' || '{{ .Slug }}';
+  var slug = '{{ .RelPermalink }}'.replace(/\//g, '-').replace(/^-|-$/g, '');
   if (!slug) return;
 
   var countEl = document.getElementById('post-views-count');
