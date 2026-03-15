@@ -7,6 +7,7 @@ explore:
   - Forensics
   - SOC
   - Threat Intel
+  - AI
 draft: false
 hot: true
 ---

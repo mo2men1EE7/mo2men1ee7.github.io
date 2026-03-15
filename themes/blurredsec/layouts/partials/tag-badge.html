@@ -14,6 +14,8 @@
 <span class="tech-badge tag-azure" style="color:{{ $tc }}">{{ $display }}{{ $emoji }}<img class="tag-icon-img" src="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/azure.png" data-normal="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/azure.png" data-glass-dark="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/azure-color.png" data-glass-light="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/azure-color.png" style="width:13px;height:13px;vertical-align:middle;margin-left:3px;object-fit:contain"></span>
 {{- else if eq $tag "gcp" -}}
 <span class="tech-badge tag-gcp" style="color:{{ $tc }}">{{ $display }}{{ $emoji }}<img class="tag-icon-img" src="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/googlecloud.png" data-normal="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/googlecloud.png" data-glass-dark="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/googlecloud-color.png" data-glass-light="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/dark/googlecloud-color.png" style="width:13px;height:13px;vertical-align:middle;margin-left:3px;object-fit:contain"></span>
+{{- else if eq $tag "ai" -}}
+<span class="tech-badge tag-ai"><span class="ai-text">AI 🤖</span></span>
 {{- else -}}
 <span class="tech-badge tag-{{ $tag | urlize }}" style="color:{{ $tc }}">{{ $display }}{{ $emoji }}</span>
 {{- end -}}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!-- tighten your belt, we are about to time travel -->
+<!-- tighten your belt, we are about to time travel -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>...</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Uncial+Antiqua&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      background: #080604;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center,
+        transparent 25%,
+        rgba(0,0,0,0.5) 60%,
+        rgba(0,0,0,0.96) 100%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+    .container {
+      text-align: center;
+      padding: 2rem;
+      max-width: 680px;
+      position: relative;
+      z-index: 2;
+      animation: breathe 10s ease-in-out infinite;
+    }
+    .neon-text {
+      font-family: 'Uncial Antiqua', serif;
+      font-size: clamp(1rem, 2.1vw, 1.22rem);
+      line-height: 2.1;
+      letter-spacing: 0.04em;
+      color: #c8a97e;
+      text-shadow: 0 1px 3px rgba(100,50,0,0.3);
+    }
+    .emoji {
+      display: block;
+      margin: 2.2rem auto 0;
+      width: 64px;
+      height: 64px;
+      animation: breathe 10s ease-in-out infinite;
+      animation-delay: 1.4s;
+      filter: sepia(0.2) brightness(0.92);
+    }
+    @keyframes breathe {
+      0%   { opacity: 0.88; }
+      15%  { opacity: 0.60; }
+      27%  { opacity: 0.15; }
+      33%  { opacity: 0.45; }
+      41%  { opacity: 0.08; }
+      50%  { opacity: 0.75; }
+      62%  { opacity: 0.88; }
+      74%  { opacity: 0.30; }
+      83%  { opacity: 0.65; }
+      100% { opacity: 0.88; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p class="neon-text">Thou hast earned my esteem; learn the byname I keep from priests and mudwit fools, and I shall owe thee a cup of wine.</p>
+    <img class="emoji" src="https://cdn.7tv.app/emote/01HM4PGHC80007635TAZG67FT5/4x.webp" alt="">
+  </div>
+</body>
+</html>

@@ -244,6 +244,7 @@
     if (!wrap) return;
 
     wrap.classList.add('clippy-in');
+    if (typeof startClippyFloat === 'function') startClippyFloat();
 
     if (instant) {
       /* already saw him — restore to buttons stage silently */
@@ -340,6 +341,129 @@ window.wp={apiFetch:function(){return Promise.resolve({})},hooks:{addFilter:func
 window.$crisp=[];
 window.CRISP_WEBSITE_ID="00000000-0000-0000-0000-000000000000";
 window.zE=function(){};
+</script>
+
+<script>
+/* ── Clippy New-Content Notifier ── */
+(function() {
+  var POLL_INTERVAL = 5 * 60 * 1000; /* 5 minutes */
+  var VERSION_URL   = '{{ "/" | absURL }}index.json';
+  var STORAGE_KEY   = 'brs-build-time';
+  var SHOWN_KEY     = 'brs-update-shown';
+
+  /* Read build time baked into this page load */
+  var pageBuildTime = {{ now.Unix }};
+
+  /* Store on first visit */
+  var stored = null;
+  try { stored = localStorage.getItem(STORAGE_KEY); } catch(e) {}
+  if (!stored) {
+    try { localStorage.setItem(STORAGE_KEY, pageBuildTime); } catch(e) {}
+    return; /* first visit — nothing to compare yet */
+  }
+
+  function showUpdateClipper() {
+    /* Don't stack with the existing Clippy flow */
+    var existing = document.getElementById('clippy-wrap');
+    if (existing && existing.classList.contains('clippy-in')) return;
+    /* Don't re-show if already shown this session */
+    try { if (sessionStorage.getItem(SHOWN_KEY) === '1') return; } catch(e) {}
+
+    var wrap   = existing || document.getElementById('clippy-wrap');
+    if (!wrap) return;
+
+    /* Cancel any ongoing animation */
+    wrap.style.animation = 'none';
+    wrap.style.transition = 'none';
+    wrap.offsetHeight;
+
+    var bubble = document.getElementById('clippy-bubble');
+    var txtEl  = document.getElementById('clippy-text');
+    var btns   = document.getElementById('clippy-btns');
+    var yesBtn = document.getElementById('clippy-yes');
+    var noBtn  = document.getElementById('clippy-no');
+    if (!bubble || !txtEl || !btns) return;
+
+    /* Override button labels for this context */
+    yesBtn.textContent = 'Alright!';
+    noBtn.textContent  = 'Later';
+
+    /* Reset state */
+    bubble.classList.remove('clippy-bubble-in');
+    btns.classList.remove('clippy-btns-show');
+    txtEl.textContent = '';
+    wrap.style.opacity   = '';
+    wrap.style.transform = '';
+
+    wrap.classList.add('clippy-in');
+    if (typeof startClippyFloat === 'function') startClippyFloat();
+
+    setTimeout(function() {
+      bubble.classList.add('clippy-bubble-in');
+      typeClipper(txtEl, "It looks like there's new content! Want to refresh to see it?", function() {
+        btns.classList.add('clippy-btns-show');
+        try { sessionStorage.setItem(SHOWN_KEY, '1'); } catch(e) {}
+      });
+    }, 600);
+
+    /* One-time listeners — remove old ones by cloning */
+    var newYes = yesBtn.cloneNode(true);
+    var newNo  = noBtn.cloneNode(true);
+    yesBtn.parentNode.replaceChild(newYes, yesBtn);
+    noBtn.parentNode.replaceChild(newNo, noBtn);
+
+    newYes.addEventListener('click', function() {
+      try { localStorage.setItem(STORAGE_KEY, pageBuildTime); } catch(e) {}
+      try { sessionStorage.removeItem(SHOWN_KEY); } catch(e) {}
+      location.reload();
+    });
+    newNo.addEventListener('click', function() {
+      try { localStorage.setItem(STORAGE_KEY, pageBuildTime); } catch(e) {}
+      wrap.style.animation = 'none';
+      wrap.style.transition = 'none';
+      wrap.offsetHeight;
+      var start = null; var dur = 500;
+      (function step(ts) {
+        if (!start) start = ts;
+        var p = Math.min((ts - start) / dur, 1);
+        wrap.style.opacity   = 1 - p;
+        wrap.style.transform = 'translateY(' + (-p * 40) + 'px)';
+        if (p < 1) { requestAnimationFrame(step); }
+        else { wrap.classList.remove('clippy-in'); wrap.style.opacity = ''; wrap.style.transform = ''; }
+      })(performance.now());
+    });
+  }
+
+  function typeClipper(el, text, cb) {
+    el.textContent = '';
+    var i = 0;
+    var iv = setInterval(function() {
+      el.textContent += text[i++];
+      if (i >= text.length) { clearInterval(iv); if (cb) cb(); }
+    }, 28);
+  }
+
+  function checkForUpdate() {
+    fetch(VERSION_URL + '?t=' + Date.now())
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var latest = data.buildTime;
+        var prev   = null;
+        try { prev = parseInt(localStorage.getItem(STORAGE_KEY)); } catch(e) {}
+        if (prev && latest && latest > prev) {
+          showUpdateClipper();
+        }
+      })
+      .catch(function() {}); /* silently fail if offline */
+  }
+
+  /* Start polling after 1 min delay (let page settle) then every 5 min */
+  setTimeout(function() {
+    checkForUpdate();
+    setInterval(checkForUpdate, POLL_INTERVAL);
+  }, 60 * 1000);
+
+})();
 </script>
 </body>
 </html>
