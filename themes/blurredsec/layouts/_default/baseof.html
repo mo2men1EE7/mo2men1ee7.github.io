@@ -475,5 +475,15 @@ window.addEventListener('pageshow', function(e) {
   if (e.persisted) { window.location.reload(); }
 });
 </script>
+
+<script>
+/* Register Service Worker — forces network-first on HTML pages */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('{{ "/" | relURL }}sw.js')
+      .catch(function() {});
+  });
+}
+</script>
 </body>
 </html>
