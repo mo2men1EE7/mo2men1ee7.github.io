@@ -8,7 +8,7 @@
       {{- $cur := $pager.PageNumber }}{{- $tot := $pager.TotalPages }}
       {{- $first := index $pager.Pagers 0 }}{{- $last := index $pager.Pagers (sub $tot 1) }}
       {{- $winStart := sub $cur 2 }}{{- $winEnd := add $cur 2 }}
-      {{- if and (gt $tot 6) (gt $winStart 1) }}<a class="pg-btn pg-edge" href="{{ $first.URL }}" title="First">&laquo;</a>{{- end }}
+      {{- if and (gt $tot 4) (gt $winStart 1) }}<a class="pg-btn pg-edge" href="{{ $first.URL }}" title="First">&laquo;</a>{{- end }}
       {{- if $pager.HasPrev }}<a class="pg-btn" href="{{ $pager.Prev.URL }}">&lt;</a>
       {{- else }}<button class="pg-btn" disabled>&lt;</button>{{- end }}
       {{- range $pager.Pagers }}
@@ -19,7 +19,7 @@
       {{- end }}
       {{- if $pager.HasNext }}<a class="pg-btn" href="{{ $pager.Next.URL }}">&gt;</a>
       {{- else }}<button class="pg-btn" disabled>&gt;</button>{{- end }}
-      {{- if and (gt $tot 6) (lt $winEnd $tot) }}<a class="pg-btn pg-edge" href="{{ $last.URL }}" title="Last">&raquo;</a>{{- end }}
+      {{- if and (gt $tot 4) (lt $winEnd $tot) }}<a class="pg-btn pg-edge" href="{{ $last.URL }}" title="Last">&raquo;</a>{{- end }}
     </div>
   </div>
 </div>

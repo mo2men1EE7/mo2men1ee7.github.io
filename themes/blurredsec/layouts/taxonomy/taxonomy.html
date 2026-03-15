@@ -18,9 +18,11 @@
       <p class="explore-group-label">{{ $label }}</p>
       <div class="explore-tag-row">
         {{- range .tags }}
-        {{- $tagSlug := . | lower | urlize }}
+        {{- $tagSlug := . | urlize }}
+        {{- $tagSlugLower := . | lower | urlize }}
         {{- $taxPages := index $.Site.Taxonomies.explore $tagSlug }}
-        {{- if and $taxPages (gt (len $taxPages) 0) }}
+        {{- $taxPagesLower := index $.Site.Taxonomies.explore $tagSlugLower }}
+        {{- if or (and $taxPages (gt (len $taxPages) 0)) (and $taxPagesLower (gt (len $taxPagesLower) 0)) }}
         <button class="explore-tag-btn" data-tag="{{ . }}" onclick="exploreFilter(this)">
           {{- partial "tag-badge.html" . }}
         </button>
@@ -78,7 +80,7 @@ function xRenderPage(page) {
   var winStart = page - 2;
   var winEnd   = page + 2;
   /* « only when page 1 is outside the visible window */
-  if (total > 6 && winStart > 1) {
+  if (total > 4 && winStart > 1) {
     pg += '<button class="pg-btn pg-edge" onclick="xRenderPage(1)" title="First">&laquo;</button>';
   }
   /* ‹ prev */
@@ -91,7 +93,7 @@ function xRenderPage(page) {
   /* › next */
   pg += page < total ? '<button class="pg-btn" onclick="xRenderPage('+(page+1)+')">&gt;</button>' : '<button class="pg-btn" disabled>&gt;</button>';
   /* » only when last page is outside the visible window */
-  if (total > 6 && winEnd < total) {
+  if (total > 4 && winEnd < total) {
     pg += '<button class="pg-btn pg-edge" onclick="xRenderPage('+total+')" title="Last">&raquo;</button>';
   }
   document.getElementById('explore-pagination').innerHTML = pg;
