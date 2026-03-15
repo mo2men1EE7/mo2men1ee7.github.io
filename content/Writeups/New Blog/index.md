@@ -4,16 +4,8 @@ date: 2026-03-15
 summary: This is my testing blog.
 explore:
   - Active Directory
-  - Forensics
-  - Malware
-  - SOC
   - Threat Hunt
   - Threat Intel
-  - Pentest
-  - DevOps
-  - Phishing
-  - AI
-  - Misc
 draft: false
 hot: true
 ---
