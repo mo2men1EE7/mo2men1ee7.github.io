@@ -48,39 +48,53 @@
 var _favOriginal = null;
 var _favOriginalType = null;
 
-function _getFavLink() {
-  return document.querySelector('link[rel~="icon"]');
-}
-
 function _makeBadgeFavicon() {
-  /* Build a pure SVG favicon — red circle, no need to load original */
   var svg = [
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">',
-    '<circle cx="16" cy="16" r="14" fill="#0d0d14" stroke="#ff0b55" stroke-width="2"/>',
-    '<text x="16" y="21" text-anchor="middle" font-size="14" font-family="monospace" fill="#ff0b55" font-weight="bold">!</text>',
-    '<circle cx="26" cy="8" r="7" fill="#ff0b55"/>',
+    '<circle cx="16" cy="16" r="14" fill="#0d0d14" stroke="#4fc3f7" stroke-width="1.5"/>',
+    '<text x="16" y="21" text-anchor="middle" font-size="13" font-family="monospace" fill="#4fc3f7" font-weight="bold">B</text>',
+    '<circle cx="25" cy="7" r="7" fill="#ff0b55"/>',
+    '<circle cx="25" cy="7" r="4" fill="#fff"/>',
     '</svg>'
   ].join('');
   return 'data:image/svg+xml,' + encodeURIComponent(svg);
 }
 
+var _favSaved = [];
+
 function faviconBadge(show) {
-  var link = _getFavLink();
-  if (!link) return;
-  if (show) {
-    if (!_favOriginal) {
-      _favOriginal = link.href;
-      _favOriginalType = link.type;
-    }
-    link.type = 'image/svg+xml';
-    link.href = _makeBadgeFavicon();
-  } else {
-    if (_favOriginal) {
-      link.href = _favOriginal;
-      if (_favOriginalType) link.type = _favOriginalType;
-      _favOriginal = null;
-      _favOriginalType = null;
-    }
+  /* target ALL icon links — browsers pick the highest-priority one */
+  var links = document.querySelectorAll('link[rel~="icon"], link[rel="shortcut icon"]');
+  if (!links.length) return;
+
+  if (show && !_favSaved.length) {
+    /* save all */
+    links.forEach(function(l) {
+      _favSaved.push({ el: l, href: l.href, type: l.type });
+    });
+    /* replace all with badge SVG */
+    var badgeHref = _makeBadgeFavicon();
+    links.forEach(function(l) {
+      l.type = 'image/svg+xml';
+      l.href = badgeHref;
+    });
+    /* also add a fresh high-priority link in case browser ignores updated ones */
+    var fresh = document.createElement('link');
+    fresh.id = '_fav-badge';
+    fresh.rel = 'icon';
+    fresh.type = 'image/svg+xml';
+    fresh.href = badgeHref;
+    document.head.appendChild(fresh);
+  } else if (!show && _favSaved.length) {
+    /* remove fresh badge link */
+    var b = document.getElementById('_fav-badge');
+    if (b) b.remove();
+    /* restore all originals */
+    _favSaved.forEach(function(s) {
+      s.el.type = s.type;
+      s.el.href = s.href;
+    });
+    _favSaved = [];
   }
 }
 </script>

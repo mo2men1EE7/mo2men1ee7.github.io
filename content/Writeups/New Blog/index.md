@@ -6,6 +6,7 @@ explore:
   - CyberDefenders
   - Threat-Intel
   - GCP
+  - Misc
 draft: false
 hot: true
 ---
@@ -22,3 +23,5 @@ this is a testing filter
 ## z azddadadadadazdazd
 ---
 dadzzda
+
+> heehei
