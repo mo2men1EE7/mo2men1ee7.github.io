@@ -1,11 +1,12 @@
 ---
 title: New Blog
-date: 2026-03-15
+date: 2026-03-14
 summary: This is my testing blog.
 explore:
+  - CyberDefenders
   - Threat-Intel
 draft: false
-hot: true
+hot: false
 ---
 
 ## Overview
