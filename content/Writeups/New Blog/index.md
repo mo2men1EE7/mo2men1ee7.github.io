@@ -6,6 +6,7 @@ explore:
   - CyberDefenders
   - Threat-Intel
   - Misc
+  - Hack-Smarter
 draft: false
 hot: true
 ---
