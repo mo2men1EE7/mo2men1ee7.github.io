@@ -5,9 +5,9 @@ summary: This is my testing blog.
 explore:
   - CyberDefenders
   - Threat-Intel
-  - AWS
+  - GCP
 draft: false
-hot: false
+hot: true
 ---
 
 ## Overview
@@ -19,4 +19,6 @@ this is a testing filter
 ```
 `azd`
 
-azddadazdazd
+## z azddadadadadazdazd
+---
+dadzzda
