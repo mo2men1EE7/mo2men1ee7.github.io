@@ -7,6 +7,14 @@ explore:
   - Hack-Smarter
   - Threat-Hunt
   - Threat-Intel
+  - Forensics
+  - Malware
+  - SOC
+  - Pentest
+  - DevOps
+  - Phishing
+  - AI
+  - Misc
 draft: false
 hot: true
 ---
