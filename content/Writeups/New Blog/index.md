@@ -1,5 +1,5 @@
 ---
-title: New Blog
+title: New Blog for testing!
 date: 2026-03-14
 summary: This is my testing blog.
 explore:
