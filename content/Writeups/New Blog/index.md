@@ -5,6 +5,7 @@ summary: This is my testing blog.
 explore:
   - CyberDefenders
   - Threat-Intel
+  - AWS
 draft: false
 hot: false
 ---
