@@ -3,13 +3,17 @@ title: New Blog
 date: 2026-03-15
 summary: This is my testing blog.
 explore:
-  - HackTheBox
-  - TryHackMe
-  - PwnedLabs
-  - PortSwigger
-  - Cryptohack
-  - Cybr
-  - Hack Smarter
+  - Active Directory
+  - Forensics
+  - Malware
+  - SOC
+  - Threat Hunt
+  - Threat Intel
+  - Pentest
+  - DevOps
+  - Phishing
+  - AI
+  - Misc
 draft: false
 hot: true
 ---
@@ -23,4 +27,4 @@ this is a testing filter
 ```
 `azd`
 
-`HackTheBox` `TryHackMe` `PwnedLabs` `PortSwigger` `HackingHub` `CyberDefenders` `Cryptohack` `Cybr` `Hack Smarter`
+`Active Directory` `Forensics` `Malware` `SOC` `Threat Hunt` `Threat Intel` `Pentest` `DevOps` `Phishing` `AI` `Misc`
