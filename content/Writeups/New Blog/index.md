@@ -9,7 +9,7 @@ explore:
   - Hack-Smarter
 draft: false
 hot: true
-keywords: wireshark
+keywords: wireshark, redhawk
 ---
 
 ## Overview
