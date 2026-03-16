@@ -4,6 +4,17 @@
 <div class="section-page no-toc">
   <h1>EXPLORE</h1>
 
+  <!-- ── Search bar with chip filters ── -->
+  <div class="explore-search-wrap">
+    <div class="explore-search-box" id="explore-search-box">
+      <svg class="explore-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <div class="explore-chips" id="explore-chips"></div>
+      <input class="explore-search-input" id="explore-search-input" type="text" placeholder="search posts, tags, topics..." autocomplete="off" spellcheck="false"/>
+      <button class="explore-search-clear" id="explore-search-clear" style="display:none" onclick="exploreClear()">✕</button>
+    </div>
+    <div class="explore-search-hint" id="explore-hint"></div>
+  </div>
+
   {{- $groups := slice
     (dict "label" "Cloud Provider" "tags" (slice "AWS" "Azure" "GCP"))
     (dict "label" "Platform" "tags" (slice "HackTheBox" "TryHackMe" "PwnedLabs" "PortSwigger" "HackingHub" "CyberDefenders" "Cryptohack" "Cybr" "Hack Smarter"))
@@ -23,7 +34,7 @@
         {{- $taxPages := index $.Site.Taxonomies.explore $tagSlug }}
         {{- $taxPagesLower := index $.Site.Taxonomies.explore $tagSlugLower }}
         {{- if or (and $taxPages (gt (len $taxPages) 0)) (and $taxPagesLower (gt (len $taxPagesLower) 0)) }}
-        <button class="explore-tag-btn" data-tag="{{ . }}" onclick="exploreFilter(this)">
+        <button class="explore-tag-btn" data-tag="{{ . }}" onclick="exploreTagClick(this)">
           {{- partial "tag-badge.html" . }}
         </button>
         {{- end }}
@@ -33,7 +44,7 @@
     {{- end }}
     <div class="explore-group clear-row">
       <div class="explore-tag-row">
-        <button class="pg-btn explore-clear-btn" id="explore-clear" onclick="exploreClear()" style="display:none">[ CLEAR FILTER ]</button>
+        <button class="pg-btn explore-clear-btn" id="explore-clear" onclick="exploreClear()" style="display:none">[ CLEAR ALL ]</button>
       </div>
     </div>
   </div>
@@ -49,13 +60,338 @@ var EXPLORE_POSTS = [
   {{- $tags := .Params.explore }}
   {{- if $tags }}
   {{- if not $first }},{{ end }}{{- $first = false }}
-  { title: '{{ .Title | replaceRE "'" "\\x27" }}', url: '{{ .Permalink }}', hot: {{ if .Params.hot }}true{{ else }}false{{ end }}, tags: [{{ range $i,$t := $tags }}{{ if $i }},{{ end }}'{{ $t }}'{{ end }}], badges: '{{ range $tags }}{{ partial "tag-badge.html" . | replaceRE "'" "\\x27" }}{{ end }}' }
+  { title: '{{ .Title | replaceRE "'" "\\x27" }}', url: '{{ .Permalink }}', hot: {{ if .Params.hot }}true{{ else }}false{{ end }}, tags: [{{ range $i,$t := $tags }}{{ if $i }},{{ end }}'{{ $t }}'{{ end }}], badges: '{{ range $tags }}{{ partial "tag-badge.html" . | replaceRE "'" "\\x27" }}{{ end }}', summary: '{{ with .Params.summary }}{{ . | replaceRE "'" "\\x27" }}{{ end }}', keywords: '{{ with .Params.keywords }}{{ delimit . " " | replaceRE "'" "\\x27" }}{{ end }}' }
   {{- end }}
   {{- end }}
 ];
 
 var _xf = [];
 var PER_PAGE = 7;
+
+/* ── Filter state ── */
+var _activeTags = [];   /* tags from tag buttons */
+var _textChips  = [];   /* typed text chips */
+var _searchText = '';   /* live text while typing */
+
+/* ── Chip management ── */
+function _renderChips() {
+  var chips = document.getElementById('explore-chips');
+  var clrBtn = document.getElementById('explore-search-clear');
+  chips.innerHTML = '';
+  /* tag chips */
+  _activeTags.forEach(function(tag) {
+    var chip = document.createElement('span');
+    chip.className = 'explore-chip';
+    chip.innerHTML = tag + ' <span class="chip-x">×</span>';
+    chip.querySelector('.chip-x').addEventListener('click', function(e) {
+      e.stopPropagation(); _removeTag(tag);
+    });
+    chips.appendChild(chip);
+  });
+  /* text chips — dashed style */
+  _textChips.forEach(function(text) {
+    var chip = document.createElement('span');
+    chip.className = 'explore-chip chip-text';
+    chip.innerHTML = '"' + text + '" <span class="chip-x">×</span>';
+    chip.querySelector('.chip-x').addEventListener('click', function(e) {
+      e.stopPropagation(); _removeTextChip(text);
+    });
+    chips.appendChild(chip);
+  });
+  clrBtn.style.display = (_activeTags.length || _textChips.length || _searchText) ? '' : 'none';
+}
+
+function _addTag(tag) {
+  if (_activeTags.indexOf(tag) === -1) _activeTags.push(tag);
+  _renderChips();
+  _applyFilters();
+}
+
+function _removeTag(tag) {
+  _activeTags = _activeTags.filter(function(t) { return t !== tag; });
+  /* deactivate the button */
+  var btn = document.querySelector('.explore-tag-btn[data-tag="' + tag + '"]');
+  if (btn) {
+    btn.classList.remove('active');
+    btn.classList.add('no-hover');
+    document.addEventListener('mousemove', function off(e) {
+      if (e.target !== btn && !btn.contains(e.target)) {
+        btn.classList.remove('no-hover');
+        document.removeEventListener('mousemove', off);
+      }
+    });
+  }
+  _renderChips();
+  _applyFilters();
+}
+
+/* ── Text chip management ── */
+function _addTextChip(text) {
+  var lower = text.toLowerCase();
+  if (_textChips.indexOf(lower) !== -1) return;
+  _textChips.push(lower);
+  _renderChips();
+  _applyFilters();
+}
+
+function _removeTextChip(text) {
+  _textChips = _textChips.filter(function(t) { return t !== text; });
+  _renderChips();
+  _applyFilters();
+}
+
+/* ── Tag button click ── */
+function exploreTagClick(btn) {
+  btn.classList.remove('no-hover');
+  var tag = btn.getAttribute('data-tag');
+  var wasActive = btn.classList.contains('active');
+  btn.classList.toggle('active');
+
+  if (wasActive) {
+    _removeTag(tag);
+  } else {
+    _addTag(tag);
+  }
+}
+
+/* ── Tag aliases for smart matching ── */
+var TAG_ALIASES = {
+  'hackthebox': 'HackTheBox', 'htb': 'HackTheBox', 'hack the box': 'HackTheBox',
+  'tryhackme': 'TryHackMe', 'thm': 'TryHackMe', 'try hack me': 'TryHackMe',
+  'pwnedlabs': 'PwnedLabs', 'pwned labs': 'PwnedLabs',
+  'portswigger': 'PortSwigger', 'port swigger': 'PortSwigger',
+  'hackinghub': 'HackingHub', 'hacking hub': 'HackingHub',
+  'cyberdefenders': 'CyberDefenders', 'cyber defenders': 'CyberDefenders',
+  'cryptohack': 'Cryptohack', 'crypto hack': 'Cryptohack',
+  'aws': 'AWS', 'amazon': 'AWS', 'amazon web services': 'AWS',
+  'azure': 'Azure', 'microsoft azure': 'Azure',
+  'gcp': 'GCP', 'google cloud': 'GCP', 'googlecloud': 'GCP',
+  'activedirectory': 'Active Directory', 'ad': 'Active Directory', 'active directory': 'Active Directory',
+  'threathunt': 'Threat Hunt', 'threat hunt': 'Threat Hunt', 'hunting': 'Threat Hunt',
+  'threatintel': 'Threat Intel', 'threat intel': 'Threat Intel', 'cti': 'Threat Intel',
+  'devops': 'DevOps', 'dev ops': 'DevOps',
+  'phishing': 'Phishing',
+  'misc': 'Misc', 'miscellaneous': 'Misc',
+  'ai': 'AI', 'artificial intelligence': 'AI',
+  'pentest': 'Pentest', 'penetration testing': 'Pentest', 'pentesting': 'Pentest',
+  'forensics': 'Forensics', 'dfir': 'Forensics',
+  'malware': 'Malware', 'malware analysis': 'Malware',
+  'soc': 'SOC', 'security operations': 'SOC', 'security operations center': 'SOC',
+  'blog': 'Blog', 'news': 'News', 'notes': 'Notes', 'cheatsheet': 'Cheatsheet', 'project': 'Project',
+  'hack smarter': 'Hack Smarter', 'hacksmarter': 'Hack Smarter',
+  'cybr': 'Cybr'
+};
+
+/* resolve typed text to a known tag if possible */
+function _resolveTag(text) {
+  var lower = text.trim().toLowerCase();
+  if (TAG_ALIASES[lower]) return TAG_ALIASES[lower];
+  /* fuzzy — check if any tag name starts with or contains the text */
+  var allTagBtns = document.querySelectorAll('.explore-tag-btn');
+  for (var i = 0; i < allTagBtns.length; i++) {
+    var tag = allTagBtns[i].getAttribute('data-tag');
+    if (tag.toLowerCase() === lower || tag.toLowerCase().indexOf(lower) === 0) return tag;
+  }
+  return null;
+}
+
+/* ── Autocomplete hint ── */
+var _hintIndex = -1;
+function _showHint(query) {
+  var hint = document.getElementById('explore-hint');
+  if (!query || query.length < 1) { hint.style.display = 'none'; _hintIndex = -1; return; }
+  var lower = query.toLowerCase();
+  /* find matching tags not already active */
+  var matches = [];
+  document.querySelectorAll('.explore-tag-btn').forEach(function(btn) {
+    var tag = btn.getAttribute('data-tag');
+    if (_activeTags.indexOf(tag) !== -1) return;
+    var score = 0;
+    if (tag.toLowerCase() === lower) score = 3;
+    else if (tag.toLowerCase().indexOf(lower) === 0) score = 2;
+    else if (tag.toLowerCase().indexOf(lower) >= 0) score = 1;
+    /* check aliases */
+    if (!score) {
+      for (var alias in TAG_ALIASES) {
+        if (TAG_ALIASES[alias] === tag && alias.indexOf(lower) >= 0) { score = 1; break; }
+      }
+    }
+    if (score) matches.push({ tag: tag, score: score, btn: btn });
+  });
+  matches.sort(function(a,b) { return b.score - a.score; });
+  matches = matches.slice(0, 5);
+
+  if (!matches.length) { hint.style.display = 'none'; _hintIndex = -1; return; }
+
+  hint.innerHTML = matches.map(function(m, idx) {
+    var badgeHtml = m.btn.innerHTML;
+    return '<div class="explore-hint-item" data-tag="' + m.tag + '" data-idx="' + idx + '">' +
+      '<span class="explore-hint-tag-badge">' + badgeHtml + '</span>' +
+      '<span class="explore-hint-label">press Enter to select</span>' +
+      '</div>';
+  }).join('');
+
+  /* click on hint item */
+  hint.querySelectorAll('.explore-hint-item').forEach(function(item) {
+    item.addEventListener('mousedown', function(e) {
+      e.preventDefault();
+      var tag = this.getAttribute('data-tag');
+      var btn = document.querySelector('.explore-tag-btn[data-tag="' + tag + '"]');
+      if (btn) { btn.classList.add('active'); }
+      _addTag(tag);
+      _searchInput.value = '';
+      _searchText = '';
+      hint.style.display = 'none';
+      _hintIndex = -1;
+    });
+  });
+
+  hint.style.display = 'block';
+  document.getElementById('explore-search-box').classList.add('hint-open');
+  _hintIndex = -1;
+  _updateHintActive();
+}
+
+function _updateHintActive() {
+  var items = document.querySelectorAll('.explore-hint-item');
+  items.forEach(function(item, idx) {
+    item.classList.toggle('hint-active', idx === _hintIndex);
+  });
+}
+
+function _hideHint() {
+  document.getElementById('explore-hint').style.display = 'none';
+  document.getElementById('explore-search-box').classList.remove('hint-open');
+  _hintIndex = -1;
+}
+
+/* ── Search input ── */
+var _searchInput = document.getElementById('explore-search-input');
+
+_searchInput.addEventListener('keydown', function(e) {
+  var hint = document.getElementById('explore-hint');
+  var items = hint.querySelectorAll('.explore-hint-item');
+
+  /* Arrow navigation in hint */
+  if (e.key === 'ArrowDown' && hint.style.display !== 'none') {
+    e.preventDefault();
+    _hintIndex = Math.min(_hintIndex + 1, items.length - 1);
+    _updateHintActive(); return;
+  }
+  if (e.key === 'ArrowUp' && hint.style.display !== 'none') {
+    e.preventDefault();
+    _hintIndex = Math.max(_hintIndex - 1, -1);
+    _updateHintActive(); return;
+  }
+  if (e.key === 'Escape') { _hideHint(); return; }
+
+  if (e.key === 'Enter' || e.key === ',' || e.key === 'Tab') {
+    e.preventDefault();
+    var val = this.value.trim().replace(/,$/, '');
+    if (!val) return;
+
+    /* TAB or Enter with hint open → pick top/selected hint item */
+    if (hint.style.display !== 'none') {
+      var pickIdx = _hintIndex >= 0 ? _hintIndex : 0;
+      if (items[pickIdx]) {
+        var tag = items[pickIdx].getAttribute('data-tag');
+        var btn = document.querySelector('.explore-tag-btn[data-tag="' + tag + '"]');
+        if (btn) btn.classList.add('active');
+        _addTag(tag);
+        this.value = ''; _searchText = ''; _hideHint(); return;
+      }
+    }
+
+    /* no hint open — try to resolve to a known tag */
+    var resolved = _resolveTag(val);
+    if (resolved) {
+      var tagBtn = document.querySelector('.explore-tag-btn[data-tag="' + resolved + '"]');
+      if (tagBtn) tagBtn.classList.add('active');
+      _addTag(resolved);
+    } else {
+      _addTextChip(val);
+    }
+    this.value = ''; _searchText = ''; _hideHint();
+  }
+
+  if (e.key === 'Backspace' && this.value === '') {
+    if (_textChips.length) { _removeTextChip(_textChips[_textChips.length - 1]); }
+    else if (_activeTags.length) { _removeTag(_activeTags[_activeTags.length - 1]); }
+  }
+});
+
+_searchInput.addEventListener('input', function() {
+  _searchText = this.value.trim().toLowerCase();
+  _showHint(this.value.trim());
+  document.getElementById('explore-search-clear').style.display = (_activeTags.length || _textChips.length || _searchText) ? '' : 'none';
+  _applyFilters();
+});
+
+_searchInput.addEventListener('blur', function() {
+  setTimeout(_hideHint, 150);
+});
+
+document.getElementById('explore-search-box').addEventListener('click', function() {
+  _searchInput.focus();
+});
+
+/* ── Apply all active filters together ── */
+function _applyFilters() {
+  var hasTags = _activeTags.length > 0;
+  var hasTextChips = _textChips.length > 0;
+  var hasText = _searchText.length > 0;
+
+  if (!hasTags && !hasTextChips && !hasText) {
+    _xf = [];
+    document.getElementById('explore-results').innerHTML = '';
+    document.getElementById('explore-pagination').innerHTML = '';
+    document.getElementById('explore-clear').style.display = 'none';
+    return;
+  }
+
+  _xf = EXPLORE_POSTS.filter(function(p) {
+    /* tag chips — AND: must have all active tags */
+    var tagMatch = !hasTags || _activeTags.every(function(t) {
+      return p.tags.indexOf(t) >= 0;
+    });
+    /* text chips — AND: must match every committed text chip */
+    var textChipMatch = _textChips.every(function(q) {
+      return p.title.toLowerCase().indexOf(q) >= 0 ||
+             (p.summary && p.summary.toLowerCase().indexOf(q) >= 0) ||
+             (p.keywords && p.keywords.toLowerCase().indexOf(q) >= 0) ||
+             p.tags.some(function(t) { return t.toLowerCase().indexOf(q) >= 0; });
+    });
+    /* live text — filter while typing */
+    var textMatch = !hasText || (
+      p.title.toLowerCase().indexOf(_searchText) >= 0 ||
+      (p.summary && p.summary.toLowerCase().indexOf(_searchText) >= 0) ||
+      (p.keywords && p.keywords.toLowerCase().indexOf(_searchText) >= 0) ||
+      p.tags.some(function(t) { return t.toLowerCase().indexOf(_searchText) >= 0; })
+    );
+    return tagMatch && textChipMatch && textMatch;
+  });
+
+  xRenderPage(1);
+  document.getElementById('explore-clear').style.display = '';
+}
+
+/* ── Keep existing exploreFilter name for compatibility ── */
+function exploreFilter(btn) { exploreTagClick(btn); }
+
+/* ── Clear everything ── */
+function exploreClear() {
+  _activeTags = [];
+  _textChips  = [];
+  _searchText = '';
+  document.getElementById('explore-search-input').value = '';
+  document.getElementById('explore-chips').innerHTML = '';
+  document.getElementById('explore-search-clear').style.display = 'none';
+  document.querySelectorAll('.explore-tag-btn').forEach(function(b) { b.classList.remove('active'); });
+  _xf = [];
+  document.getElementById('explore-results').innerHTML = '';
+  document.getElementById('explore-pagination').innerHTML = '';
+  document.getElementById('explore-clear').style.display = 'none';
+}
 
 function xMakeCard(p) {
   var badges = p.badges || '';
@@ -79,74 +415,17 @@ function xRenderPage(page) {
   var pg = '';
   var winStart = page - 2;
   var winEnd   = page + 2;
-  /* « only when page 1 is outside the visible window */
-  if (winStart > 1) {
-    pg += '<button class="pg-btn pg-edge" onclick="xRenderPage(1)" title="First">&laquo;</button>';
-  }
-  /* ‹ prev */
-  pg += page > 1 ? '<button class="pg-btn" onclick="xRenderPage('+(page-1)+')">&lt;</button>' : '<button class="pg-btn" disabled>&lt;</button>';
-  /* windowed ±2, no forced endpoints */
+  if (winStart > 1) pg += '<button class="pg-btn pg-edge" onclick="xRenderPage(1)" title="First">&laquo;</button>';
+  pg += page > 1 ? '<button class="pg-btn" onclick="xRenderPage('+(page-1)+')">&#60;</button>' : '<button class="pg-btn" disabled>&#60;</button>';
   for (var k = 1; k <= total; k++) {
     if (k < winStart || k > winEnd) continue;
-    pg += '<button class="pg-btn'+(k===page?' active':'')+'" onclick="xRenderPage('+k+')">'+k+'</button>';
+    pg += '<button class="pg-btn'+(k===page?' active':'')+'\" onclick="xRenderPage('+k+')">'+k+'</button>';
   }
-  /* › next */
-  pg += page < total ? '<button class="pg-btn" onclick="xRenderPage('+(page+1)+')">&gt;</button>' : '<button class="pg-btn" disabled>&gt;</button>';
-  /* » only when last page is outside the visible window */
-  if (winEnd < total) {
-    pg += '<button class="pg-btn pg-edge" onclick="xRenderPage('+total+')" title="Last">&raquo;</button>';
-  }
+  pg += page < total ? '<button class="pg-btn" onclick="xRenderPage('+(page+1)+')">&#62;</button>' : '<button class="pg-btn" disabled>&#62;</button>';
+  if (winEnd < total) pg += '<button class="pg-btn pg-edge" onclick="xRenderPage('+total+')" title="Last">&raquo;</button>';
   document.getElementById('explore-pagination').innerHTML = pg;
   injectLangIcons();
   updateTagIcons();
-}
-
-function exploreFilter(btn) {
-  /* always clear no-hover first so re-clicking while still hovering works */
-  btn.classList.remove('no-hover');
-  var wasActive = btn.classList.contains('active');
-
-  /* toggle this tag on/off */
-  btn.classList.toggle('active');
-
-  /* if we just deactivated — snap back to rest state immediately,
-     restore hover only after cursor moves away */
-  if (wasActive) {
-    btn.classList.add('no-hover');
-    document.addEventListener('mousemove', function off(e) {
-      if (e.target !== btn && !btn.contains(e.target)) {
-        btn.classList.remove('no-hover');
-        document.removeEventListener('mousemove', off);
-      }
-    });
-  }
-
-  /* collect all currently active tags */
-  var activeTags = [];
-  document.querySelectorAll('.explore-tag-btn.active').forEach(function(b) {
-    activeTags.push(b.getAttribute('data-tag'));
-  });
-
-  if (activeTags.length === 0) {
-    exploreClear();
-    return;
-  }
-
-  /* AND filter — post must have every active tag */
-  _xf = EXPLORE_POSTS.filter(function(p) {
-    return activeTags.every(function(t) { return p.tags.indexOf(t) >= 0; });
-  });
-
-  xRenderPage(1);
-  document.getElementById('explore-clear').style.display = '';
-}
-
-function exploreClear() {
-  _xf = [];
-  document.querySelectorAll('.explore-tag-btn').forEach(function(b) { b.classList.remove('active'); });
-  document.getElementById('explore-results').innerHTML = '';
-  document.getElementById('explore-pagination').innerHTML = '';
-  document.getElementById('explore-clear').style.display = 'none';
 }
 </script>
 {{ end }}
