@@ -12,6 +12,7 @@ difficulty: Insane
 hot: true
 og_description:
   - From web foothold to Domain Admin via ADCS ESC8 and GCP abuse
+keywords: redhawk, wireshark
 ---
 
 ## Notice Box Showcase
