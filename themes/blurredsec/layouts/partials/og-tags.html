@@ -1,0 +1,31 @@
+{{- $tags := .Params.explore -}}
+{{- $x := 72 -}}
+{{- $y := 370 -}}
+{{- range $i, $tag := $tags -}}
+{{- if lt $i 5 -}}
+{{- $lower := $tag | lower -}}
+{{- $fill := "rgba(157,125,234,0.10)" -}}
+{{- $stroke := "rgba(157,125,234,0.45)" -}}
+{{- $color := "#c084fc" -}}
+{{- if eq $lower "hackthebox" -}}{{- $fill = "rgba(159,239,0,0.10)" -}}{{- $stroke = "rgba(159,239,0,0.45)" -}}{{- $color = "#9fef00" -}}{{- end -}}
+{{- if eq $lower "tryhackme" -}}{{- $fill = "rgba(194,9,9,0.10)" -}}{{- $stroke = "rgba(194,9,9,0.45)" -}}{{- $color = "#ff7070" -}}{{- end -}}
+{{- if eq $lower "pwnedlabs" -}}{{- $fill = "rgba(138,43,226,0.10)" -}}{{- $stroke = "rgba(138,43,226,0.45)" -}}{{- $color = "#c97fff" -}}{{- end -}}
+{{- if eq $lower "portswigger" -}}{{- $fill = "rgba(255,106,57,0.10)" -}}{{- $stroke = "rgba(255,106,57,0.45)" -}}{{- $color = "#ff8c42" -}}{{- end -}}
+{{- if eq $lower "hackinghub" -}}{{- $fill = "rgba(92,26,138,0.10)" -}}{{- $stroke = "rgba(92,26,138,0.45)" -}}{{- $color = "#c080ff" -}}{{- end -}}
+{{- if eq $lower "cyberdefenders" -}}{{- $fill = "rgba(47,88,220,0.10)" -}}{{- $stroke = "rgba(47,88,220,0.45)" -}}{{- $color = "#7b9fff" -}}{{- end -}}
+{{- if eq $lower "aws" -}}{{- $fill = "rgba(255,156,8,0.10)" -}}{{- $stroke = "rgba(255,156,8,0.45)" -}}{{- $color = "#FFB74D" -}}{{- end -}}
+{{- if eq $lower "azure" -}}{{- $fill = "rgba(1,120,188,0.10)" -}}{{- $stroke = "rgba(1,120,188,0.45)" -}}{{- $color = "#60c8ff" -}}{{- end -}}
+{{- if eq $lower "gcp" -}}{{- $fill = "rgba(66,133,244,0.10)" -}}{{- $stroke = "rgba(66,133,244,0.45)" -}}{{- $color = "#90b8ff" -}}{{- end -}}
+{{- if eq $lower "cheatsheet" -}}{{- $fill = "rgba(46,139,110,0.10)" -}}{{- $stroke = "rgba(46,139,110,0.45)" -}}{{- $color = "#7fffcf" -}}{{- end -}}
+{{- if eq $lower "notes" -}}{{- $fill = "rgba(107,142,159,0.10)" -}}{{- $stroke = "rgba(107,142,159,0.45)" -}}{{- $color = "#b0ccd8" -}}{{- end -}}
+{{- if eq $lower "blog" -}}{{- $fill = "rgba(123,79,46,0.10)" -}}{{- $stroke = "rgba(123,79,46,0.45)" -}}{{- $color = "#d4956a" -}}{{- end -}}
+{{- if eq $lower "news" -}}{{- $fill = "rgba(229,57,53,0.10)" -}}{{- $stroke = "rgba(229,57,53,0.45)" -}}{{- $color = "#ff8080" -}}{{- end -}}
+{{- if eq $lower "project" -}}{{- $fill = "rgba(212,114,74,0.10)" -}}{{- $stroke = "rgba(212,114,74,0.45)" -}}{{- $color = "#ffcdb2" -}}{{- end -}}
+{{- if eq $lower "devops" -}}{{- $fill = "rgba(196,154,0,0.10)" -}}{{- $stroke = "rgba(196,154,0,0.45)" -}}{{- $color = "#ffd966" -}}{{- end -}}
+{{- if eq $lower "phishing" -}}{{- $fill = "rgba(58,175,169,0.10)" -}}{{- $stroke = "rgba(58,175,169,0.45)" -}}{{- $color = "#80fffa" -}}{{- end -}}
+{{- $w := mul (len $tag) 9 | add 28 -}}
+<rect x="{{ $x }}" y="{{ $y }}" width="{{ $w }}" height="34" rx="3" fill="{{ $fill }}" stroke="{{ $stroke }}" stroke-width="1"/>
+<text x="{{ add $x (div $w 2) }}" y="{{ add $y 22 }}" font-family="monospace" font-size="13" fill="{{ $color }}" font-weight="700" text-anchor="middle" filter="url(#tg)">{{ $tag }}</text>
+{{- $x = add $x (add $w 10) -}}
+{{- end -}}
+{{- end -}}
