@@ -10,7 +10,8 @@ explore:
   - Blog
 difficulty: Insane
 hot: true
-draft: false
+og_description:
+  - From web foothold to Domain Admin via ADCS ESC8 and GCP abuse
 ---
 
 ## Notice Box Showcase
