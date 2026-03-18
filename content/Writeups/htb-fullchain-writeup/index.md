@@ -10,9 +10,8 @@ explore:
   - Blog
 difficulty: Insane
 hot: true
-og_description:
-  - From web foothold to Domain Admin via ADCS ESC8 and GCP abuse
-keywords: redhawk, wireshark
+draft: false
+og_description: "SSTI → NTLM relay → ADCS ESC8 → Docker escape → GCP privilege escalation to Domain Admin"
 ---
 
 ## Notice Box Showcase

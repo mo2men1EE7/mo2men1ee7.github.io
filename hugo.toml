@@ -43,18 +43,6 @@ languageCode = "en"
 
 [outputs]
   home = ["HTML", "RSS", "JSON"]
-  page = ["HTML", "OGImage"]
-
-[mediaTypes]
-  [mediaTypes."image/svg+xml"]
-    suffixes = ["svg"]
-
-[outputFormats]
-  [outputFormats.OGImage]
-    mediaType = "image/svg+xml"
-    baseName  = "og"
-    isHTML    = false
-    notAlternative = true
 
 [taxonomies]
   tag = "explore"

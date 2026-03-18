@@ -17,11 +17,7 @@
 {{- else -}}{{- $ogDesc = site.Params.description -}}
 {{- end -}}
 {{- $ogTitle := .Title | default site.Title -}}
-{{- $ogImage := "" -}}
-{{- range .AlternativeOutputFormats -}}
-  {{- if eq .Name "OGImage" -}}{{- $ogImage = .Permalink -}}{{- end -}}
-{{- end -}}
-{{- if not $ogImage -}}{{- $ogImage = absURL "/images/og-default.svg" -}}{{- end -}}
+{{- $ogImage := absURL "/images/og-default.png" -}}
 <meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}"/>
 <meta property="og:title" content="{{ $ogTitle }}"/>
 <meta property="og:description" content="{{ $ogDesc }}"/>
