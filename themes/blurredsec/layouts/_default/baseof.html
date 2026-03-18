@@ -13,11 +13,23 @@
 <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ site.Params.description }}{{ end }}"/>
 {{- $ogDesc := "" -}}
 {{- if .Params.og_description -}}{{- $ogDesc = .Params.og_description -}}
-{{- else if .Params.summary -}}{{- $ogDesc = .Params.summary | truncate 160 -}}
+{{- else if .Params.summary -}}{{- $ogDesc = .Params.summary | truncate 100 -}}
 {{- else -}}{{- $ogDesc = site.Params.description -}}
 {{- end -}}
 {{- $ogTitle := .Title | default site.Title -}}
+{{- $ogDate := .Date.Format "January 2, 2006" -}}
 {{- $ogImage := absURL "/images/og-default.png" -}}
+{{- if .IsPage -}}
+  {{- $workerBase := "https://blurredsec-views.mmlayel.workers.dev/og" -}}
+  {{- $params := printf "?title=%s&desc=%s&date=%s" ($ogTitle | urlquery) ($ogDesc | urlquery) ($ogDate | urlquery) -}}
+  {{- $tagList := "" -}}
+  {{- range $i, $t := .Params.explore -}}
+    {{- if $i -}}{{- $tagList = printf "%s,%s" $tagList $t -}}{{- else -}}{{- $tagList = $t -}}{{- end -}}
+  {{- end -}}
+  {{- if $tagList -}}{{- $params = printf "%s&tags=%s" $params ($tagList | urlquery) -}}{{- end -}}
+  {{- if .Params.hot -}}{{- $params = printf "%s&hot=true" $params -}}{{- end -}}
+  {{- $ogImage = printf "%s%s" $workerBase $params -}}
+{{- end -}}
 <meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}"/>
 <meta property="og:title" content="{{ $ogTitle }}"/>
 <meta property="og:description" content="{{ $ogDesc }}"/>
