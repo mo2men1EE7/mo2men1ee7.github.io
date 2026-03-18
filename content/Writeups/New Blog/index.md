@@ -9,6 +9,9 @@ explore:
   - Hack-Smarter
 draft: false
 hot: true
+keywords: wireshark, hackthebox, redhawk
+og_description:
+  - From web foothold to Domain Admin via ADCS ESC8 and GCP abuse
 ---
 
 ## Overview
